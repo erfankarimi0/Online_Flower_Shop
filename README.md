@@ -1,2 +1,2 @@
 # Online_Flower_Shop
-Online flower shop website built with ASP.NET Core MVC, C#, Entity Framework Core, and SQL Server.
+An online flower shop backend built with ASP.NET Core Web API, C#, Entity Framework Core, and SQL Server.
