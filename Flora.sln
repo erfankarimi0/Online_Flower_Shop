@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37614.0 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flora", "Flora\Flora.csproj", "{02AB7535-40AA-45BC-9693-069B0F82F7DC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02AB7535-40AA-45BC-9693-069B0F82F7DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02AB7535-40AA-45BC-9693-069B0F82F7DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02AB7535-40AA-45BC-9693-069B0F82F7DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02AB7535-40AA-45BC-9693-069B0F82F7DC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A8E99505-20BC-498F-955E-AB073B4FECB4}
+	EndGlobalSection
+EndGlobal
