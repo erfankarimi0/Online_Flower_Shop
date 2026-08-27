@@ -1,6 +1,6 @@
 ﻿using Flora.DTOs.Buyer;
 using Flora.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Flora.Controllers
@@ -10,28 +10,64 @@ namespace Flora.Controllers
     public class BuyerController : ControllerBase
     {
         private readonly IBuyerService _buyerService;
+
         public BuyerController(IBuyerService buyerService)
         {
             _buyerService = buyerService;
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Create(CreateBuyerDto dto)
         {
             var result = await _buyerService.CreateAsync(dto);
-            if (result == false)
+
+            if (result == null)
             {
                 return Conflict(new
                 {
-                    messagePN = "این شماره تلفن قبلاً ثبت شده است."
+                    message = "این شماره تلفن قبلاً ثبت شده است. لطفاً وارد شوید."
                 });
-             }
-            else
-            {
-                return Ok();
             }
+
+            return Ok(new
+            {
+                message = "ثبت‌ نام با موفقیت انجام شد.",
+                token = result.Token
+            });
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginBuyerDto dto)
+        {
+            var result = await _buyerService.LoginAsync(dto);
+
+            if (result == null)
+            {
+                return Unauthorized(new
+                {
+                    message = "شماره تلفن یا رمز عبور اشتباه است."
+                });
+            }
+
+            return Ok(new
+            {
+                message = "ورود با موفقیت انجام شد.",
+                token = result.Token
+            });
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public IActionResult Me()
+        {
+            return Ok(new
+            {
+                message = "شما احراز هویت شدید.",
+                buyerId = User.FindFirst(
+                    System.Security.Claims.ClaimTypes.NameIdentifier
+                )?.Value
+            });
         }
     }
-
 }
+

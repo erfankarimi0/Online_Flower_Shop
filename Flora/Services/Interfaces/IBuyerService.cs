@@ -4,8 +4,7 @@ namespace Flora.Services.Interfaces
 {
     public interface IBuyerService
     {
-        Task<bool> CreateAsync(CreateBuyerDto dto);
+        Task<CreateBuyerResultDto?> CreateAsync(CreateBuyerDto dto);
+        Task<LoginBuyerResultDto?> LoginAsync(LoginBuyerDto dto);
     }
 }
-
-
