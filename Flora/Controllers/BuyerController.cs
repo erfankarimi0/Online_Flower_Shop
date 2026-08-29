@@ -58,15 +58,96 @@ namespace Flora.Controllers
 
         [HttpGet("me")]
         [Authorize]
-        public IActionResult Me()
+        public async Task<IActionResult> Me()
         {
-            return Ok(new
+            var buyerIdValue = User.FindFirst(
+                System.Security.Claims.ClaimTypes.NameIdentifier
+            )?.Value;
+
+            if (!int.TryParse(buyerIdValue, out var buyerId))
             {
-                message = "شما احراز هویت شدید.",
-                buyerId = User.FindFirst(
-                    System.Security.Claims.ClaimTypes.NameIdentifier
-                )?.Value
-            });
+                return Unauthorized();
+            }
+
+            var result = await _buyerService.GetMeAsync(buyerId);
+            if (result == null)
+            {
+                return NotFound(new
+                {
+                    message = "اطلاعات کاربر پیدا نشد."
+                });
+            }
+
+            return Ok(result);
+        }
+
+
+
+        [HttpPut("me")]
+        [Authorize]
+        public async Task<IActionResult> UpdateMe(UpdateBuyerDto dto)
+        {
+            var buyerIdValue = User.FindFirst(
+                System.Security.Claims.ClaimTypes.NameIdentifier
+            )?.Value;
+
+            if (!int.TryParse(buyerIdValue, out var buyerId))
+            {
+                return Unauthorized();
+            }
+
+            var result = await _buyerService.UpdateMeAsync(buyerId, dto);
+
+            switch (result.Status)
+            {
+                case UpdateBuyerStatus.BuyerNotFound:
+                    return NotFound(new
+                    {
+                        message = "کاربر پیدا نشد."
+                    });
+
+                case UpdateBuyerStatus.NoChanges:
+                    return BadRequest(new
+                    {
+                        message = "حداقل یکی از اطلاعات را برای ویرایش وارد کنید."
+                    });
+
+                case UpdateBuyerStatus.SameFirstName:
+                    return BadRequest(new
+                    {
+                        message = "نام جدید با نام فعلی شما یکسان است."
+                    });
+
+                case UpdateBuyerStatus.SameLastName:
+                    return BadRequest(new
+                    {
+                        message = "نام خانوادگی جدید با نام خانوادگی فعلی شما یکسان است."
+                    });
+
+                case UpdateBuyerStatus.SamePhoneNumber:
+                    return BadRequest(new
+                    {
+                        message = "شماره تلفن جدید با شماره فعلی شما یکسان است."
+                    });
+
+                case UpdateBuyerStatus.PhoneNumberExists:
+                    return Conflict(new
+                    {
+                        message = "این شماره تلفن قبلاً ثبت شده است."
+                    });
+
+                case UpdateBuyerStatus.Success:
+                    return Ok(new
+                    {
+                        message = "اطلاعات با موفقیت ویرایش شد.",
+                        buyer = result.Buyer,
+                        token = result.Token
+
+                    });
+
+                default:
+                    return BadRequest();
+            }
         }
     }
 }

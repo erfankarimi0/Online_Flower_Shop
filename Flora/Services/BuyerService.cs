@@ -27,10 +27,8 @@ namespace Flora.Services
         public async Task<CreateBuyerResultDto?> CreateAsync(CreateBuyerDto dto)
         {
             // چک کردن شماره تلفن تکراری
-            var phonenumber = dto.PhoneNumber;
-
             var checkphonenumber = await _context.Buyers
-                .AnyAsync(p => p.PhoneNumber == phonenumber);
+                .AnyAsync(p => p.PhoneNumber == dto.PhoneNumber);
 
             if (checkphonenumber)
             {
@@ -39,7 +37,6 @@ namespace Flora.Services
 
             // ثبت کاربر و هش کردن رمز
             var hashed = Hasher.HashPassword(dto.Password);
-
             var buyer = new Buyer
             {
                 FirstName = dto.FirstName,
@@ -65,10 +62,9 @@ namespace Flora.Services
         public async Task<LoginBuyerResultDto?> LoginAsync(LoginBuyerDto dto)
         {
             // چک کردن شماره همراه
-            var phonenumberV = dto.PhoneNumber;
 
             var buyerV = await _context.Buyers
-                .FirstOrDefaultAsync(p => p.PhoneNumber == phonenumberV);
+                .SingleOrDefaultAsync(p => p.PhoneNumber == dto.PhoneNumber);
 
             if (buyerV == null)
             {
@@ -95,5 +91,131 @@ namespace Flora.Services
                 Token = token
             };
         }
+
+
+        public async Task<GetBuyerDto?> GetMeAsync(int buyerId)
+        {
+            var buyer = await _context.Buyers
+                .SingleOrDefaultAsync(p => p.Id == buyerId);
+
+            if (buyer == null)
+            {
+                return null;
+            }
+
+            return new GetBuyerDto
+            {
+                FirstName = buyer.FirstName,
+                LastName = buyer.LastName,
+                PhoneNumber = buyer.PhoneNumber
+            };
+        }
+
+
+        public async Task<UpdateBuyerResultDto> UpdateMeAsync(int buyerId,UpdateBuyerDto dto)
+        {
+            var buyer = await _context.Buyers
+                .SingleOrDefaultAsync(p => p.Id == buyerId);
+
+            if (buyer == null)
+            {
+                return new UpdateBuyerResultDto
+                {
+                    Status = UpdateBuyerStatus.BuyerNotFound
+                };
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.FirstName) &&
+                string.IsNullOrWhiteSpace(dto.LastName) &&
+                string.IsNullOrWhiteSpace(dto.PhoneNumber))
+            {
+                return new UpdateBuyerResultDto
+                {
+                    Status = UpdateBuyerStatus.NoChanges
+                };
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.FirstName) &&
+                dto.FirstName == buyer.FirstName)
+            {
+                return new UpdateBuyerResultDto
+                {
+                    Status = UpdateBuyerStatus.SameFirstName
+                };
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.LastName) &&
+                dto.LastName == buyer.LastName)
+            {
+                return new UpdateBuyerResultDto
+                {
+                    Status = UpdateBuyerStatus.SameLastName
+                };
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
+            {
+                if (dto.PhoneNumber == buyer.PhoneNumber)
+                {
+                    return new UpdateBuyerResultDto
+                    {
+                        Status = UpdateBuyerStatus.SamePhoneNumber
+                    };
+                }
+
+                var phoneExists = await _context.Buyers
+                    .AnyAsync(p =>
+                        p.PhoneNumber == dto.PhoneNumber &&
+                        p.Id != buyerId);
+
+                if (phoneExists)
+                {
+                    return new UpdateBuyerResultDto
+                    {
+                        Status = UpdateBuyerStatus.PhoneNumberExists
+                    };
+                }
+            }
+
+            bool phoneChanged = !string.IsNullOrWhiteSpace(dto.PhoneNumber);
+            if (!string.IsNullOrWhiteSpace(dto.FirstName))
+            {
+                buyer.FirstName = dto.FirstName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.LastName))
+            {
+                buyer.LastName = dto.LastName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
+            {
+                buyer.PhoneNumber = dto.PhoneNumber;
+            }
+
+            await _context.SaveChangesAsync();
+
+            string? newToken = null;
+
+            if (phoneChanged)
+            {
+                newToken = _tokenService.CreateToken(buyer);
+            }
+
+            return new UpdateBuyerResultDto
+            {
+                Status = UpdateBuyerStatus.Success,
+
+                Buyer = new GetBuyerDto
+                {
+                    FirstName = buyer.FirstName,
+                    LastName = buyer.LastName,
+                    PhoneNumber = buyer.PhoneNumber
+                },
+
+                Token = newToken
+            };
+        }
+
     }
 }
