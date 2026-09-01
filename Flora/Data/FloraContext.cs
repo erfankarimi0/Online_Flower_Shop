@@ -147,10 +147,18 @@ public partial class FloraContext : DbContext
         {
             entity.ToTable("Seller");
 
-            entity.HasOne(d => d.Shop).WithMany(p => p.Sellers)
-                .HasForeignKey(d => d.ShopId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Seller_Shop");
+            entity.Property(e => e.FirstName).HasMaxLength(50);
+            entity.Property(e => e.LastName).HasMaxLength(50);
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.PasswordSalt)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(11)
+                .IsUnicode(false)
+                .IsFixedLength();
         });
 
         modelBuilder.Entity<Send>(entity =>
@@ -174,6 +182,11 @@ public partial class FloraContext : DbContext
         modelBuilder.Entity<Shop>(entity =>
         {
             entity.ToTable("Shop");
+
+            entity.HasOne(d => d.Seller).WithMany(p => p.Shops)
+                .HasForeignKey(d => d.SellerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Shop_Seller");
         });
 
         modelBuilder.Entity<ShopPhoto>(entity =>

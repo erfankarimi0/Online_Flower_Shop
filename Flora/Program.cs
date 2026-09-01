@@ -20,6 +20,8 @@ builder.Services.AddDbContext<FloraContext>(options =>
 builder.Services.AddHostedService<BuyerInactiveService>();
 // BuyerService
 builder.Services.AddScoped<IBuyerService, BuyerService>();
+// SellerService
+builder.Services.AddScoped<ISellerService, SellerService>();
 
 // TokenService
 builder.Services.AddScoped<ITokenService, TokenService>();

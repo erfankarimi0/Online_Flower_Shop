@@ -44,5 +44,35 @@ namespace Flora.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+
+
+        public string CreateSellerToken(Seller seller)
+        {
+            var key = _configuration["Jwt:Key"];
+
+            var securityKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(key!)
+            );
+
+            var credentials = new SigningCredentials(
+                securityKey,
+                SecurityAlgorithms.HmacSha256
+            );
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, seller.Id.ToString()),
+                new Claim(ClaimTypes.MobilePhone, seller.PhoneNumber)
+            };
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(7),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }
