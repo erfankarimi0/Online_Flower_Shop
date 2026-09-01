@@ -1,4 +1,5 @@
 ﻿using Flora.DTOs.Buyer;
+using Flora.Enums;
 
 public class UpdateBuyerResultDto
 {

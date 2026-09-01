@@ -1,10 +1,11 @@
 ﻿using Flora.Data;
 using Flora.DTOs.Buyer;
+using Flora.Enums;
 using Flora.Models;
 using Flora.Services.Interfaces;
 using Flora.Utils;
 using Microsoft.EntityFrameworkCore;
-
+using System.Collections.Generic;
 namespace Flora.Services
 {
     public class BuyerService : IBuyerService
@@ -28,7 +29,7 @@ namespace Flora.Services
         {
             // چک کردن شماره تلفن تکراری
             var checkphonenumber = await _context.Buyers
-                .AnyAsync(p => p.PhoneNumber == dto.PhoneNumber);
+                .AnyAsync(p => p.PhoneNumber == dto.PhoneNumber && p.Status != BuyerStatus.Deleted.ToString());
 
             if (checkphonenumber)
             {
@@ -61,10 +62,12 @@ namespace Flora.Services
 
         public async Task<LoginBuyerResultDto?> LoginAsync(LoginBuyerDto dto)
         {
-            // چک کردن شماره همراه
-
+            // چک کردن شماره همراه و وضعیت حساب
             var buyerV = await _context.Buyers
-                .SingleOrDefaultAsync(p => p.PhoneNumber == dto.PhoneNumber);
+                .FirstOrDefaultAsync(p =>
+                    p.PhoneNumber == dto.PhoneNumber &&
+                    p.Status != BuyerStatus.Deleted.ToString() &&
+                    p.Status != BuyerStatus.Blocked.ToString());
 
             if (buyerV == null)
             {
@@ -82,6 +85,16 @@ namespace Flora.Services
             {
                 return null;
             }
+            // اضافه کردن بخش آخرین لاگین جهت غیرفعال کردن وضعیت خریدار
+            buyerV.LastLoginDate = DateTime.UtcNow;
+
+            if (buyerV.Status == BuyerStatus.Inactive.ToString())
+            {
+                buyerV.Status = BuyerStatus.Active.ToString();
+            }
+
+            await _context.SaveChangesAsync();
+
 
             // ساخت JWT
             var token = _tokenService.CreateToken(buyerV);
@@ -166,7 +179,8 @@ namespace Flora.Services
                 var phoneExists = await _context.Buyers
                     .AnyAsync(p =>
                         p.PhoneNumber == dto.PhoneNumber &&
-                        p.Id != buyerId);
+                        p.Id != buyerId &&
+                        p.Status != BuyerStatus.Deleted.ToString());
 
                 if (phoneExists)
                 {
@@ -217,5 +231,23 @@ namespace Flora.Services
             };
         }
 
+
+
+        public async Task<bool> DeleteMeAsync(int buyerId)
+        {
+            var buyer = await _context.Buyers
+                .SingleOrDefaultAsync(p => p.Id == buyerId);
+
+            if (buyer == null)
+            {
+                return false;
+            }
+
+            buyer.Status = BuyerStatus.Deleted.ToString();
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace Flora.Services.Interfaces
         Task<LoginBuyerResultDto?> LoginAsync(LoginBuyerDto dto);
         Task<GetBuyerDto?> GetMeAsync(int buyerId);
         Task<UpdateBuyerResultDto> UpdateMeAsync(int buyerId, UpdateBuyerDto dto);
+        Task<bool> DeleteMeAsync(int buyerId);
     }
 }

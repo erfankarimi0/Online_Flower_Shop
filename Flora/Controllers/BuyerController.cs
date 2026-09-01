@@ -2,7 +2,7 @@
 using Flora.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Flora.Enums;
 namespace Flora.Controllers
 {
     [Route("api/[controller]")]
@@ -29,10 +29,19 @@ namespace Flora.Controllers
                 });
             }
 
+            Response.Cookies.Append(
+                "access_token",
+                result.Token,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7)
+                }
+            );
+
             return Ok(new
             {
-                message = "ثبت‌ نام با موفقیت انجام شد.",
-                token = result.Token
+                message = "ثبت‌ نام با موفقیت انجام شد."
             });
         }
 
@@ -49,10 +58,19 @@ namespace Flora.Controllers
                 });
             }
 
+            Response.Cookies.Append(
+                "access_token",
+                result.Token,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7)
+                }
+            );
+
             return Ok(new
             {
-                message = "ورود با موفقیت انجام شد.",
-                token = result.Token
+                message = "ورود با موفقیت انجام شد."
             });
         }
 
@@ -137,18 +155,76 @@ namespace Flora.Controllers
                     });
 
                 case UpdateBuyerStatus.Success:
+
+                    // اگر شماره تلفن تغییر کرده باشد Service یک Token جدید ساخته است.
+                    if (result.Token != null)
+                    {
+                        Response.Cookies.Append(
+                            "access_token",
+                            result.Token,
+                            new CookieOptions
+                            {
+                                HttpOnly = true,
+                                Expires = DateTimeOffset.UtcNow.AddDays(7)
+                            }
+                        );
+                    }
+
                     return Ok(new
                     {
                         message = "اطلاعات با موفقیت ویرایش شد.",
-                        buyer = result.Buyer,
-                        token = result.Token
-
+                        buyer = result.Buyer
                     });
 
                 default:
                     return BadRequest();
             }
         }
-    }
-}
 
+
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("access_token");
+            return Ok(new
+            {
+                message = "با موفقیت از حساب کاربری خارج شدید."
+            });
+        }
+
+
+
+        [HttpDelete("me")]
+        [Authorize]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var buyerIdValue = User.FindFirst(
+                System.Security.Claims.ClaimTypes.NameIdentifier
+            )?.Value;
+
+            if (!int.TryParse(buyerIdValue, out var buyerId))
+            {
+                return Unauthorized();
+            }
+
+            var result = await _buyerService.DeleteMeAsync(buyerId);
+
+            if (!result)
+            {
+                return NotFound(new
+                {
+                    message = "اطلاعات کاربر پیدا نشد."
+                });
+            }
+
+            Response.Cookies.Delete("access_token");
+
+            return Ok(new
+            {
+                message = "حساب کاربری با موفقیت حذف شد."
+            });
+        }
+    }
+
+}

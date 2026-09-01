@@ -1,4 +1,5 @@
-﻿using Flora.Data;
+﻿using Flora.BackgroundServices;
+using Flora.Data;
 using Flora.Services;
 using Flora.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,7 +16,8 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<FloraContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("FloraConnection")));
-
+// BuyerInactiveService
+builder.Services.AddHostedService<BuyerInactiveService>();
 // BuyerService
 builder.Services.AddScoped<IBuyerService, BuyerService>();
 
@@ -43,11 +45,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
 
+        // خواندن JWT از HttpOnly Cookie
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies["access_token"];
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 // Authorization
 builder.Services.AddAuthorization();
-//زمانی که پروژه استارت زده میشود
+
+// زمانی که پروژه استارت زده میشود
 var app = builder.Build();
 
 app.UseHttpsRedirection();

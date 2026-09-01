@@ -1,4 +1,5 @@
-﻿public enum UpdateBuyerStatus
+﻿namespace Flora.Enums;
+public enum UpdateBuyerStatus
 {
     Success,
     BuyerNotFound,
