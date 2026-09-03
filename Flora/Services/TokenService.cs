@@ -33,7 +33,8 @@ namespace Flora.Services
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, buyer.Id.ToString()),
-                new Claim(ClaimTypes.MobilePhone, buyer.PhoneNumber)
+                new Claim(ClaimTypes.MobilePhone, buyer.PhoneNumber),
+                new Claim(ClaimTypes.Role, "Buyer")
             };
 
             var token = new JwtSecurityToken(
@@ -63,7 +64,8 @@ namespace Flora.Services
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, seller.Id.ToString()),
-                new Claim(ClaimTypes.MobilePhone, seller.PhoneNumber)
+                new Claim(ClaimTypes.MobilePhone, seller.PhoneNumber),
+                new Claim(ClaimTypes.Role, "Seller")
             };
 
             var token = new JwtSecurityToken(

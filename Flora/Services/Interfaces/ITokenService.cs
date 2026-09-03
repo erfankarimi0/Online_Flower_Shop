@@ -1,7 +1,10 @@
 ﻿using Flora.Models;
 
-public interface ITokenService
+namespace Flora.Services.Interfaces
 {
-    string CreateToken(Buyer buyer);//buyer
-    string CreateSellerToken(Seller seller);
+    public interface ITokenService
+    {
+        string CreateToken(Buyer buyer);
+        string CreateSellerToken(Seller seller);
+    }
 }

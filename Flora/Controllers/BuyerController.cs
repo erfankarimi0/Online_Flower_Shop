@@ -75,7 +75,7 @@ namespace Flora.Controllers
         }
 
         [HttpGet("me")]
-        [Authorize]
+        [Authorize(Roles = "Buyer")]
         public async Task<IActionResult> Me()
         {
             var buyerIdValue = User.FindFirst(
@@ -102,7 +102,7 @@ namespace Flora.Controllers
 
 
         [HttpPut("me")]
-        [Authorize]
+        [Authorize(Roles = "Buyer")]
         public async Task<IActionResult> UpdateMe(UpdateBuyerDto dto)
         {
             var buyerIdValue = User.FindFirst(
@@ -118,43 +118,43 @@ namespace Flora.Controllers
 
             switch (result.Status)
             {
-                case UpdateBuyerStatus.BuyerNotFound:
+                case UpdateProfileStatus.NotFound:
                     return NotFound(new
                     {
                         message = "کاربر پیدا نشد."
                     });
 
-                case UpdateBuyerStatus.NoChanges:
+                case UpdateProfileStatus.NoChanges:
                     return BadRequest(new
                     {
                         message = "حداقل یکی از اطلاعات را برای ویرایش وارد کنید."
                     });
 
-                case UpdateBuyerStatus.SameFirstName:
+                case UpdateProfileStatus.SameFirstName:
                     return BadRequest(new
                     {
                         message = "نام جدید با نام فعلی شما یکسان است."
                     });
 
-                case UpdateBuyerStatus.SameLastName:
+                case UpdateProfileStatus.SameLastName:
                     return BadRequest(new
                     {
                         message = "نام خانوادگی جدید با نام خانوادگی فعلی شما یکسان است."
                     });
 
-                case UpdateBuyerStatus.SamePhoneNumber:
+                case UpdateProfileStatus.SamePhoneNumber:
                     return BadRequest(new
                     {
                         message = "شماره تلفن جدید با شماره فعلی شما یکسان است."
                     });
 
-                case UpdateBuyerStatus.PhoneNumberExists:
+                case UpdateProfileStatus.PhoneNumberExists:
                     return Conflict(new
                     {
                         message = "این شماره تلفن قبلاً ثبت شده است."
                     });
 
-                case UpdateBuyerStatus.Success:
+                case UpdateProfileStatus.Success:
 
                     // اگر شماره تلفن تغییر کرده باشد Service یک Token جدید ساخته است.
                     if (result.Token != null)
@@ -183,20 +183,8 @@ namespace Flora.Controllers
 
 
 
-        [HttpPost("logout")]
-        public IActionResult Logout()
-        {
-            Response.Cookies.Delete("access_token");
-            return Ok(new
-            {
-                message = "با موفقیت از حساب کاربری خارج شدید."
-            });
-        }
-
-
-
         [HttpDelete("me")]
-        [Authorize]
+        [Authorize(Roles = "Buyer")]
         public async Task<IActionResult> DeleteAccount()
         {
             var buyerIdValue = User.FindFirst(

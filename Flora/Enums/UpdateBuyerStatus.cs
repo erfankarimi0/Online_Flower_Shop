@@ -1,8 +1,8 @@
 ﻿namespace Flora.Enums;
-public enum UpdateBuyerStatus
+public enum UpdateProfileStatus
 {
     Success,
-    BuyerNotFound,
+    NotFound,
     NoChanges,
     PhoneNumberExists,
     SamePhoneNumber,

@@ -134,7 +134,7 @@ namespace Flora.Services
             {
                 return new UpdateBuyerResultDto
                 {
-                    Status = UpdateBuyerStatus.BuyerNotFound
+                    Status = UpdateProfileStatus.NotFound
                 };
             }
 
@@ -144,7 +144,7 @@ namespace Flora.Services
             {
                 return new UpdateBuyerResultDto
                 {
-                    Status = UpdateBuyerStatus.NoChanges
+                    Status = UpdateProfileStatus.NoChanges
                 };
             }
 
@@ -153,7 +153,7 @@ namespace Flora.Services
             {
                 return new UpdateBuyerResultDto
                 {
-                    Status = UpdateBuyerStatus.SameFirstName
+                    Status = UpdateProfileStatus.SameFirstName
                 };
             }
 
@@ -162,7 +162,7 @@ namespace Flora.Services
             {
                 return new UpdateBuyerResultDto
                 {
-                    Status = UpdateBuyerStatus.SameLastName
+                    Status = UpdateProfileStatus.SameLastName
                 };
             }
 
@@ -172,7 +172,7 @@ namespace Flora.Services
                 {
                     return new UpdateBuyerResultDto
                     {
-                        Status = UpdateBuyerStatus.SamePhoneNumber
+                        Status = UpdateProfileStatus.SamePhoneNumber
                     };
                 }
 
@@ -186,7 +186,7 @@ namespace Flora.Services
                 {
                     return new UpdateBuyerResultDto
                     {
-                        Status = UpdateBuyerStatus.PhoneNumberExists
+                        Status = UpdateProfileStatus.PhoneNumberExists
                     };
                 }
             }
@@ -218,7 +218,7 @@ namespace Flora.Services
 
             return new UpdateBuyerResultDto
             {
-                Status = UpdateBuyerStatus.Success,
+                Status = UpdateProfileStatus.Success,
 
                 Buyer = new GetBuyerDto
                 {

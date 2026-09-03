@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Flora.DTOs.Buyer
+namespace Flora.DTOs.Seller
 {
-    public class UpdateBuyerDto
+    public class UpdateSellerDto
     {
         [StringLength(50)]
-        [RegularExpression(@"^[\u0621-\u063A\u0641-\u064A\u067E\u0686\u0698\u06A9\u06AF\u06CC]+$")] 
+        [RegularExpression(@"^[\u0621-\u063A\u0641-\u064A\u067E\u0686\u0698\u06A9\u06AF\u06CC]+$")]
         public string? FirstName { get; set; }
 
         [StringLength(50)]

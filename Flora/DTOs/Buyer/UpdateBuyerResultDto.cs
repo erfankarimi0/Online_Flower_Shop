@@ -3,7 +3,7 @@ using Flora.Enums;
 
 public class UpdateBuyerResultDto
 {
-    public UpdateBuyerStatus Status { get; set; }
+    public UpdateProfileStatus Status { get; set; }
 
     public GetBuyerDto? Buyer { get; set; }
 
